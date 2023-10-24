@@ -10,6 +10,9 @@ is_healthy = True
 def get_uptime():
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
+@app.route("/hello")
+def hello():
+    return "Hello!"
 
 @app.route("/healthcheck")
 def health_check():
