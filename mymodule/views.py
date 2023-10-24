@@ -16,6 +16,6 @@ def hello():
 
 @app.route("/healthcheck")
 def health_check():
-    result = jsonify(isOk=is_healthy, uptime=get_uptime(), timestamp=time.time())
+    result = jsonify(IsOk=is_healthy, current_date=get_uptime(), epoch_time=time.time())
     result.status_code = 200 if is_healthy else 500
     return result
