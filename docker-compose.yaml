@@ -13,6 +13,6 @@ services:
  db:
   image: postgres:latest
   environment:
-    POSTGRES_DB: "Back-end"
-    POSTGRES_USER: "postgres"
-    POSTGRES_PASSWORD: "Kirito124"
+    POSTGRES_DB: "back_end_4gd4"
+    POSTGRES_USER: "back_end_4gd4_user"
+    POSTGRES_PASSWORD: "AsrTpmGMGkdBkoxPfEJ7rZmD7vLxtlRb"

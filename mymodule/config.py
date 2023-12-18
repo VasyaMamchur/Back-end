@@ -1,7 +1,7 @@
 PROPAGATE_EXCEPTIONS = True
 FLASK_DEBUG = True
 
-SQLALCHEMY_DATABASE_URI = "postgresql://postgres:Kirito124@localhost:5432/Back-end"
+SQLALCHEMY_DATABASE_URI = "postgresql://back_end_4gd4_user:AsrTpmGMGkdBkoxPfEJ7rZmD7vLxtlRb@dpg-clvk98la73kc73bqonrg-a/back_end_4gd4"
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 API_TITLE = "Finance REST API"
