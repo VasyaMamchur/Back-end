@@ -4,7 +4,7 @@ from flask_migrate import Migrate
 import psycopg2
 
 def get_db_connection():
-    return psycopg2.connect(host="dpg-clvk98la73kc73bqonrg-a", database="back_end_4gd4", user="back_end_4gd4_user", password="AsrTpmGMGkdBkoxPfEJ7rZmD7vLxtlRb")
+    return psycopg2.connect(host="dpg-cm041ned3nmc738j45bg-a", database="back_end_1vxx", user="admin", password="zROLWMZmaXBWInlu4wHHV4sh11MgH3kF")
 
 
 

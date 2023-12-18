@@ -11,8 +11,8 @@ services:
    ports:
      - "5000:8080"
  db:
-  image: postgres:latest
+  image: postgres:15
   environment:
-    POSTGRES_DB: "back_end_4gd4"
-    POSTGRES_USER: "back_end_4gd4_user"
-    POSTGRES_PASSWORD: "AsrTpmGMGkdBkoxPfEJ7rZmD7vLxtlRb"
+    POSTGRES_DB: "back_end_1vxx"
+    POSTGRES_USER: "admin"
+    POSTGRES_PASSWORD: "zROLWMZmaXBWInlu4wHHV4sh11MgH3kF"
