@@ -15,7 +15,7 @@ class UserModel(db.Model):
         self.name = name
 
 
-class BankAccountModel(db.Model):
+class IncomeAccountingModel(db.Model):
     __tablename__ = "accounts"
 
     id = db.Column(db.Integer, primary_key=True)
