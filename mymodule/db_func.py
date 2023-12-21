@@ -1,21 +1,7 @@
 import psycopg2
-from mymodule import db
+
 def get_db_connection():
     return psycopg2.connect(host="dpg-cm041ned3nmc738j45bg-a", database="back_end_1vxx", user="admin", password="zROLWMZmaXBWInlu4wHHV4sh11MgH3kF")
-
-
-def add(data):
-    db.session.add(data)
-    db.session.commit()
-
-
-def update():
-    db.session.commit()
-
-
-def delete(data):
-    db.session.delete(data)
-    db.session.commit()
 
 def create_tables():
     commands = (

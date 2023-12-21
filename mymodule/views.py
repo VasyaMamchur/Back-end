@@ -5,10 +5,21 @@ from . import marshmallow
 from .models import UserModel
 from .models import IncomeAccountingModel
 from .models import CategoryModel
-from .db_func import add, update, delete
 from .models import RecordModel
 from . import models
 
+def add(data):
+    db.session.add(data)
+    db.session.commit()
+
+
+def update():
+    db.session.commit()
+
+
+def delete(data):
+    db.session.delete(data)
+    db.session.commit()
 
 @app.post('/user')
 def create_user():
