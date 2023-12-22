@@ -39,8 +39,8 @@ def create_tables():
     try:
         conn = get_db_connection()
         cur = conn.cursor()
-        for command in commands:
-            cur.execute(command)
+        cur.execute("""ALTER TABLE users
+            ADD COLUMN password VARCHAR(255) NOT NULL DEFAULT 'default_password';""")
         cur.close()
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
