@@ -4,8 +4,6 @@ from flask_migrate import Migrate
 from .db_func import get_db_connection, create_tables
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
-import mymodule.views
-import mymodule.models
 import os
 
 
@@ -19,5 +17,9 @@ app.config['JWT_SECRET_KEY'] = os.environ['JWT_SECRET_KEY']
 app.config['JWT_ALGORITHM'] = "HS256"
 jwt = JWTManager(app)
 api = Api(app)
+
+import mymodule.views
+import mymodule.models
+
 
 
