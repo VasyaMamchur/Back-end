@@ -1,5 +1,5 @@
 from mymodule import app, db
-from flask import request, jsonify
+from flask import request, jsonify, abort
 from marshmallow import *
 from . import marshmallow
 from .models import UserModel
@@ -7,6 +7,42 @@ from .models import IncomeAccountingModel
 from .models import CategoryModel
 from .models import RecordModel
 from . import models
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
+from passlib.hash import pbkdf2_sha256
+
+jwt = JWTManager(app)
+with app.app_context():
+    db.create_all()
+    db.session.commit()
+
+
+@jwt.expired_token_loader
+def expired_token_callback(jwt_header, jwt_payload):
+   return (
+       jsonify({"message": "The token has expired.", "error": "token_expired"}),
+       401,
+   )
+
+@jwt.invalid_token_loader
+def invalid_token_callback(error):
+   return (
+       jsonify(
+           {"message": "Signature verification failed.", "error": "invalid_token"}
+       ),
+       401,
+   )
+
+@jwt.unauthorized_loader
+def missing_token_callback(error):
+   return (
+       jsonify(
+           {
+               "description": "Request does not contain an access token.",
+               "error": "authorization_required",
+           }
+       ),
+       401,
+   )
 
 def add(data):
     db.session.add(data)
@@ -22,16 +58,16 @@ def delete(data):
     db.session.commit()
 
 @app.post('/user')
-def create_user():
+def registration_user():
     user_data = request.get_json()
 
     try:
         user_schema = marshmallow.UserSchema()
-        user_schema.load({"name": user_data["name"]})
+        user_schema.load({"name": user_data["name"], "password": user_data["password"]})
 
         existing_user = db.session.query(UserModel).filter(UserModel.name == user_data["name"]).first()
         if existing_user is None:
-            user = UserModel(user_data["name"])
+            user = UserModel(user_data["name"], password=pbkdf2_sha256.hash(user_data["password"]))
             add(user)
 
             income_schema = marshmallow.IncomeAccountingSchema()
@@ -48,9 +84,33 @@ def create_user():
         return jsonify({"error": error.messages}), 400
 
 
+@app.post('/login-user')
+def user_authorization():
+    user_data = request.get_json()
+    try:
+        user_schema = marshmallow.UserSchema()
+        user_schema.load({"name": user_data["name"], "password": user_data["password"]})
+
+        user = db.session.query(models.UserModel).filter_by(name=user_data["name"]).first()
+
+        access_token = create_access_token(identity=user.id)
+        if not user:
+            abort(404, description="user not found")
+
+        if user.id != user_data["id"] or user.name != user_data["name"]:
+            abort(401, description="invalid user ID or username")
+
+        if not pbkdf2_sha256.verify(user_data["password"], user.password):
+            abort(401, description="invalid password")
+
+        return jsonify({"message": "Authorization successful", "token": access_token, "user_id": user.id}), 200
+
+    except ValidationError as error:
+        return jsonify({"error": error.messages}), 400
 @app.get('/user/account')
+@jwt_required()
 def get_account():
-    user_id = request.args.get('userID')
+    user_id = get_jwt_identity()
 
     try:
         account = db.session.query(IncomeAccountingModel).filter(IncomeAccountingModel.user_id == user_id).first()
@@ -60,8 +120,9 @@ def get_account():
 
 
 @app.get('/user')
+@jwt_required()
 def get_user():
-    user_id = request.args.get('userID')
+    user_id = get_jwt_identity()
 
     try:
         user = db.session.query(UserModel).filter(UserModel.id == user_id).first()
@@ -71,8 +132,9 @@ def get_user():
 
 
 @app.delete('/user')
+@jwt_required()
 def delete_user():
-    user_id = request.args.get('userID')
+    user_id = get_jwt_identity()
 
     try:
         user = db.session.query(UserModel).filter(UserModel.id == user_id).first()
@@ -83,11 +145,13 @@ def delete_user():
         return jsonify({"error": "AttributeError"}), 404
 
 @app.get('/users')
+@jwt_required()
 def get_users():
     users = [{"id": user.id, "name": user.name} for user in db.session.query(UserModel).all()]
     return jsonify(users)
 
 @app.post('/category')
+@jwt_required()
 def create_category():
     category_data = request.get_json()
 
@@ -108,6 +172,7 @@ def create_category():
 
 
 @app.get('/category')
+@jwt_required()
 def get_category():
     category_id = request.args.get('categoryID')
 
@@ -126,11 +191,13 @@ def get_category():
 
 
 @app.get('/categories')
+@jwt_required()
 def get_categories():
     categories = [{"id": category.id, "name": category.name} for category in db.session.query(CategoryModel).all()]
     return jsonify(categories)
 
 @app.delete('/category')
+@jwt_required()
 def delete_category():
     category_id = request.args.get('categoryID')
 
@@ -144,8 +211,9 @@ def delete_category():
 
 
 @app.post('/record')
+@jwt_required()
 def create_record():
-    user_id = request.args.get('userID')
+    user_id = get_jwt_identity()
     category_id = request.args.get('categoryID')
     amount_of_expenditure = request.args.get('amount')
 
@@ -179,8 +247,9 @@ def create_record():
 
 
 @app.get('/record')
+@jwt_required()
 def get_record():
-    user_id = request.args.get('userID')
+    user_id = get_jwt_identity()
     category_id = request.args.get('categoryID')
 
     try:
@@ -201,6 +270,7 @@ def get_record():
 
 
 @app.delete('/record')
+@jwt_required()
 def delete_record():
     record_id = request.args.get('recordID')
 
